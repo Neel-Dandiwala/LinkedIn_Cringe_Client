@@ -10,7 +10,7 @@ const Detector = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/predict', { text });
+      const response = await axios.post('https://linkedin-cringe-server.onrender.com/predict', { text });
       setScore(Math.min(Math.max(response.data.score * 100, 0), 100));
     } catch (error) {
       console.error('Error:', error);

@@ -6,7 +6,6 @@ const ThreeScene = ({ score }) => {
   const BALLS_COUNT = 30;
 
   useEffect(() => {
-    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -14,10 +13,8 @@ const ThreeScene = ({ score }) => {
     renderer.setClearColor(0x000000, 0);
     mountRef.current.appendChild(renderer.domElement);
 
-    // Position camera further back to see larger spheres
     camera.position.z = 20;
 
-    // Lighting
     const getLightColors = (score) => {
       if (!score) return [0xedb543, 0xffffff, 0xa655f6];
       if(score < 20) return [0xf45c2c, 0xf97217, 0xee4445];
@@ -41,7 +38,6 @@ const ThreeScene = ({ score }) => {
     scene.add(directionalLight);
     scene.add(directionalLight2);
 
-    // Load textures
     const textureLoader = new THREE.TextureLoader();
     const textures = {
       love: textureLoader.load('/images/love.jpg'),      // Not cringe
@@ -51,9 +47,8 @@ const ThreeScene = ({ score }) => {
       angry: textureLoader.load('/images/angry.jpg')     // Very cringe
     };
 
-    // Create larger emoji spheres
-    const DAMPING = 0.98; // Add damping to slow down movement
-    const COLLISION_ELASTICITY = 0.5; // Reduce bounce strength
+    const DAMPING = 0.98; 
+    const COLLISION_ELASTICITY = 0.5;
     const SPHERE_RADIUS = 3;
     const INITIAL_VELOCITY_SCALE = 0.1;
     const BOUNDARY = {
@@ -74,7 +69,6 @@ const ThreeScene = ({ score }) => {
       });
     }
 
-    // Create all emoji spheres
     const activeTextures = (score) => {
       if(!score) return [textures.love, textures.like, textures.laugh, textures.surprise, textures.angry];
       if(score < 20) return [textures.love];
@@ -146,7 +140,6 @@ const ThreeScene = ({ score }) => {
           const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
           if (distance < SPHERE_RADIUS * 2) {
-            // Calculate collision normal
             const nx = dx / distance;
             const ny = dy / distance;
             const nz = dz / distance;
@@ -158,15 +151,12 @@ const ThreeScene = ({ score }) => {
             sphereB.position.y += ny * overlap;
             sphereB.position.z += nz * overlap;
 
-            // Calculate relative velocity
             const dvx = sphereB.userData.velocity.x - sphereA.userData.velocity.x;
             const dvy = sphereB.userData.velocity.y - sphereA.userData.velocity.y;
             const dvz = sphereB.userData.velocity.z - sphereA.userData.velocity.z;
 
-            // Calculate impulse
             const impulse = (dvx * nx + dvy * ny + dvz * nz) * COLLISION_ELASTICITY;
 
-            // Apply impulse
             sphereA.userData.velocity.x += nx * impulse;
             sphereA.userData.velocity.y += ny * impulse;
             sphereA.userData.velocity.z += nz * impulse;
@@ -179,40 +169,12 @@ const ThreeScene = ({ score }) => {
       }
     }
 
-    // Create curved shapes (matching image)
-    const createCurvedShape = (color) => {
-      const geometry = new THREE.CylinderGeometry(0.4, 0.4, 15, 32, 1, true);
-      const material = new THREE.MeshPhongMaterial({
-        color: color,
-        transparent: true,
-        opacity: 0.2,
-        side: THREE.DoubleSide
-      });
-      return new THREE.Mesh(geometry, material);
-    };
-
-    // Add two main curved shapes from image
-    const curvedShapes = [];
-    const shape1 = createCurvedShape(0xff69b4); // Pink
-    shape1.position.set(-10, 0, -10);
-    shape1.rotation.set(0.5, 0.5, -0.3);
-    // scene.add(shape1);
-    // curvedShapes.push(shape1);
-
-    const shape2 = createCurvedShape(0x40E0D0); // Teal
-    shape2.position.set(10, 0, -10);
-    shape2.rotation.set(-0.3, -0.5, 0.5);
-    // scene.add(shape2);
-    // curvedShapes.push(shape2);
-
-    // Animation
     const animate = () => {
       requestAnimationFrame(animate);
       const time = Date.now() * 0.001;
 
       checkCollisions();
 
-      // Gentle floating animation for spheres
       spheres.forEach((sphere) => {
         
 
@@ -231,7 +193,6 @@ const ThreeScene = ({ score }) => {
 
     animate();
 
-    // Handle window resize
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -240,7 +201,6 @@ const ThreeScene = ({ score }) => {
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       mountRef.current?.removeChild(renderer.domElement);
@@ -253,7 +213,7 @@ const ThreeScene = ({ score }) => {
       });
       renderer.dispose();
     };
-  }, [score]); // Added score dependency
+  }, [score]);
 
   return <div ref={mountRef} className="absolute inset-0 -z-10" />;
 };
